@@ -16,6 +16,23 @@ module Search
         SearchClient.get(id: tag_id, index: INDEX_ALIAS)
       end
 
+      def search(query_string)
+        SearchClient.search(
+          index: INDEX_ALIAS,
+          body: {
+            query: {
+              query_string: {
+                query: query_string,
+                analyze_wildcard: true
+              }
+            },
+            sort: {
+              hotness_score: "desc"
+            }
+          },
+        )
+      end
+
       def create_index(index_name: INDEX_NAME)
         SearchClient.indices.create(index: index_name, body: settings)
       end

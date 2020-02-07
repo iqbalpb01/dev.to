@@ -9,6 +9,16 @@ class TagsController < ApplicationController
     @tags = Tag.includes(:sponsorship).order(hotness_score: :desc).limit(100)
   end
 
+  def search
+    skip_authorization
+    search = Search::Tag.search("name:#{params[:name]}* AND supported:true")
+    tags = search.dig("hits", "hits").map do |tag|
+      { name: tag.dig("_source", "name") }
+    end
+
+    render json: { result: tags }
+  end
+
   def edit
     @tag = Tag.find_by!(name: params[:tag])
     authorize @tag
